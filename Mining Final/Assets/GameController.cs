@@ -26,7 +26,6 @@ public class GameController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (Time.time >= doSomethingTime) {
-			//getting a gold cube when I start the program. how to fix? 
 			if (bronzeCount == 2 && silverCount == 2 && goldCount < 1) {
 				//spawn gold
 				Instantiate(goldPrefabCube, new Vector3(Random.Range(-8f, 8f), Random.Range(-3f, 5f), 0), Quaternion.identity);
