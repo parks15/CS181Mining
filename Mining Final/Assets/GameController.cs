@@ -44,6 +44,6 @@ public class GameController : MonoBehaviour {
 		doSomethingTime += spawnTime;
 		print(GameController.score);
 		}
-	}	
+	}
 }
 
