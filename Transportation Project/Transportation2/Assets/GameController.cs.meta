@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 837f81fb17c5e444980e3c6977552f5e
+timeCreated: 1445278609
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - Airplane: {fileID: 185370, guid: bc84fc258d20d4019861833f9be3a4e2, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
