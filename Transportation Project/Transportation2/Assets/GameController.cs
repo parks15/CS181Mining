@@ -46,7 +46,6 @@ public Airplane airplane;
 			//update airplane location
 			airplane.x = x;
 			airplane.y = y;
-			//! problem: airplane won't activate on same x or y axis as previous airplane
 		}
 	}
 	
