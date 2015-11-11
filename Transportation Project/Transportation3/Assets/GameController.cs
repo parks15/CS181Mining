@@ -43,6 +43,8 @@ public class GameController : MonoBehaviour {
 		airplane.x = startX;
 		airplane.y = startY;
 		allCubes[startX,startY].GetComponent<Renderer>().material.color = Color.red;
+		airplane.targetX = startX;
+		airplane.targetY = startY;
 		//there's a black cube in the bottom left
 		allCubes[depotX,depotY].GetComponent<Renderer>().material.color = Color.black;
 	}
@@ -80,37 +82,58 @@ public class GameController : MonoBehaviour {
 	//plane can't move past boundaries of array
 	public void CheckInput() {
 		if (Input.GetKey("up") && airplane.y < 8) {
-			moveY++;
-			moved = true;
+			airplane.targetY++;
 		}
 		else if (Input.GetKey("down") && airplane.y > 0) {
-			moveY--;
-			moved = true;
+			airplane.targetY--;
 		}
 		else if (Input.GetKey("right") && airplane.x < 15) {
-			moveX++;
-			moved = true;
+			airplane.targetX++;
 		}
 		else if (Input.GetKey("left") && airplane.x > 0) {
-			moveX--;
-			moved = true;
+			airplane.targetX--;
 		}
 	}
 
-	public void MovePlane () {
-		if (airplane.active == true && moved == true) {
-			//set cubes to white (or depot to black)
+	public void MoveAirplane() {
+		int nextX = 0;
+		int nextY = 0;
+		//move 1 unit in target direction
+		if (airplane.targetX > airplane.x) {
+			nextX++;
+		}
+		else if (airplane.targetX < airplane.x) {
+			nextX--;
+		}
+		else if (airplane.targetY > airplane.y) {
+			nextY++;
+		}
+		else if (airplane.targetY < airplane.y) {
+			nextY--;
+		}
+
+		//set old cube to black if plane is in the depot
+		if (airplane.x == depotX && airplane.y == depotY) {
+			allCubes[airplane.x, airplane.y].GetComponent<Renderer>().material.color = Color.black;
+		}
+		//or set old cube to white
+		else {
 			allCubes[airplane.x, airplane.y].GetComponent<Renderer>().material.color = Color.white;
-			allCubes[depotX, depotY].GetComponent<Renderer>().material.color = Color.black;
-			//update plane location
-			airplane.x += moveX;
-			airplane.y += moveY;
-			//set plane to yellow
+		}
+		//update airplane location
+		airplane.x += nextX;
+		airplane.y += nextY;
+		nextX = 0;
+		nextY = 0;
+		airplane.targetX = airplane.x;
+		airplane.targetY = airplane.y;
+		//if airplane is active, set to yellow
+		if (airplane.active) {
 			allCubes[airplane.x, airplane.y].GetComponent<Renderer>().material.color = Color.yellow;
-			//reset movement data
-			moveX = 0;
-			moveY = 0;
-			moved = false;
+		}
+		//or red if not active
+		else {
+			allCubes[airplane.x, airplane.y].GetComponent<Renderer>().material.color = Color.red;
 		}
 	}
 	
@@ -119,6 +142,7 @@ public class GameController : MonoBehaviour {
 		//check for input every frame
 		CheckInput();
 		if (Time.time >= timeToAct) {
+			MoveAirplane();
 			//check if airplane is in starting position
 			//if so, add 10 cargo, but not above max capacity
 			if (airplane.x == startX && airplane.y == startY && airplane.cargo < cargoCapacity) {
@@ -132,7 +156,6 @@ public class GameController : MonoBehaviour {
 				airplane.cargo = 0;
 				print ("Score: "+score);
 			}
-			MovePlane();
 			timeToAct += turnLength;
 		}
 	}

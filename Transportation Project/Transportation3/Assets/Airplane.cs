@@ -6,4 +6,5 @@ public class Airplane {
 	public int moveX, moveY;
 	public int cargo, cargoCapacity;
 	public bool active;
+	public int targetX, targetY;
 }
