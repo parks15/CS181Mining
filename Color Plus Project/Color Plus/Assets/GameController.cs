@@ -45,7 +45,7 @@ public class GameController : MonoBehaviour {
 		allCubes = new GameObject[gridWidth, gridHeight];
 		for (int x = 0; x < gridWidth; x++) {
 			for (int y = 0; y < gridHeight; y++) {
-				allCubes[x,y] = (GameObject) Instantiate(cubePrefab, new Vector3(x*1.5f - 8, y*1.5f - 4, 20), Quaternion.identity);
+				allCubes[x,y] = (GameObject) Instantiate(cubePrefab, new Vector3(x*1.3f - 6, y*1.3f - 4, 20), Quaternion.identity);
 				allCubes[x,y].GetComponent<CubeBehavior>().x = x;
 				allCubes[x,y].GetComponent<CubeBehavior>().y = y;
 				allCubes[x,y].GetComponent<Renderer>().material.color = Color.white;
