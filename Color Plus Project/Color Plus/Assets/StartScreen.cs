@@ -29,7 +29,6 @@ public class StartScreen : MonoBehaviour {
 		Application.LoadLevel(3);
 	}
 
-	/*
 	public void LoadInstructionScreen () {
 		Application.LoadLevel(1);
 	}
@@ -37,15 +36,12 @@ public class StartScreen : MonoBehaviour {
 	public void LoadAboutScreen () {
 		Application.LoadLevel(2);
 	}
-	*/
 
 	// Update is called once per frame
 	void Update () {
-		if (Time.time > timeToSwitch) {
+		if (Time.timeSinceLevelLoad > timeToSwitch) {
 			titleText.color = titleColors[Random.Range(0, numColors)];
 			timeToSwitch += switchColorTime;
 		}
 	}
 }
-
-//Tutorial: https://www.youtube.com/watch?v=pT4uca2bSgc

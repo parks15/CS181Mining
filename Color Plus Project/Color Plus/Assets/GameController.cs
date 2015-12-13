@@ -10,6 +10,7 @@ public class GameController : MonoBehaviour {
 	int gridHeight = 5;
 	int activeX = 0;
 	int activeY = 0;
+	public Text nextCubeUI;
 	//color array info
 	private Color[] cubeColors;
 	int numColors = 5;
@@ -24,7 +25,7 @@ public class GameController : MonoBehaviour {
 	int blackCubeX;
 	int blackCubeY;
 	//cube traits
-	bool active = false;
+	public bool active = false;
 	float growFactor = 1.2f;
 	float shrinkFactor = 1.0f;
 	//timing
@@ -49,16 +50,19 @@ public class GameController : MonoBehaviour {
 	void Start () {
 		timeToAct += turnLength;
 		//make green score UI
+		score = 0;
 		scoreUI.text = "Score: " + score;
-		scoreUI.color = Color.green;
+		scoreUI.color = Color.yellow;
 		//make blue timer UI
 		timerUI.text = "Time left:";
-		timerUI.color = Color.blue;
+		timerUI.color = Color.green;
+		//make Next Cube text
+		nextCubeUI.color = Color.cyan;
 		//make a cube grid
 		allCubes = new GameObject[gridWidth, gridHeight];
 		for (int x = 0; x < gridWidth; x++) {
 			for (int y = 0; y < gridHeight; y++) {
-				allCubes[x,y] = (GameObject) Instantiate(cubePrefab, new Vector3(x*1.3f - 6, y*1.3f - 4, 10), Quaternion.identity);
+				allCubes[x,y] = (GameObject) Instantiate(cubePrefab, new Vector3(x*1.3f - 5, y*1.3f - 4, 10), Quaternion.identity);
 				allCubes[x,y].GetComponent<CubeBehavior>().x = x;
 				allCubes[x,y].GetComponent<CubeBehavior>().y = y;
 				allCubes[x,y].GetComponent<Renderer>().material.color = Color.white;
@@ -79,8 +83,10 @@ public class GameController : MonoBehaviour {
 		if (cubeGenerated) {
 			//destroy it,
 			Destroy(randomCube);
-			//subtract from score,
-			score -= noMovePoints;
+			//subtract from score (as long as score is still positive)
+			if (score > 0) {
+				score -= noMovePoints;
+			}
 			//assign random black cube to a free spot
 			freeSpotFound = false;
 			while (freeSpotFound == false) {
@@ -97,7 +103,7 @@ public class GameController : MonoBehaviour {
 			cubeGenerated = false;
 		}
 		//create a new random cube
-		randomCube = (GameObject) Instantiate(cubePrefab, new Vector3(5, 0, 0), Quaternion.identity);
+		randomCube = (GameObject) Instantiate(cubePrefab, new Vector3(0, 3, 0), Quaternion.identity);
 		randomCube.GetComponent<Renderer>().material.color = cubeColors[Random.Range(0, 5)];
 		cubeGenerated = true;
 	}
@@ -198,38 +204,44 @@ public class GameController : MonoBehaviour {
 	}
 
 	public void ProcessClickedCube (GameObject clickedCube, int x, int y) {
-		//If the player clicks an inactive cube, it activates/grows
+		//If the player clicks an inactive cube, it grows & is active
 		if (active == false && allCubes[x, y].GetComponent<Renderer>().material.color != Color.white && allCubes[x, y].GetComponent<Renderer>().material.color != Color.black) {
 			active = true;
 			activeX = x;
 			activeY = y;
 			allCubes[activeX, activeY].transform.localScale = new Vector3 (growFactor, growFactor, growFactor); 
 		}
-		//if player clicks on adjacent white cube,
-		else if (allCubes[x, y].GetComponent<Renderer>().material.color == Color.white && (x == activeX + 1 || x == activeX - 1 || y == activeY + 1 || y == activeY - 1)) {
-			//adjacent cube changes color
-			allCubes[x, y].GetComponent<Renderer>().material.color = allCubes[activeX, activeY].GetComponent<Renderer>().material.color;
-			//old cube deactivates/shrinks
-			allCubes[activeX, activeY].GetComponent<Renderer>().material.color = Color.white;
-			allCubes[activeX, activeY].transform.localScale = new Vector3 (shrinkFactor, shrinkFactor, shrinkFactor); 
-			//coordinates & active status reset
-			activeX = 0;
-			activeY = 0;
-			active = false;
-		}
 		//if player clicks an active cube,
 		else if (active && x == activeX && y == activeY) {
 			//cube shrinks
 			allCubes[activeX, activeY].transform.localScale = new Vector3 (shrinkFactor, shrinkFactor, shrinkFactor); 
-			//coordinates & active status reset
-			activeX = 0;
-			activeY = 0;
+			//no active cubes exist
 			active = false;
+		}
+		//if player clicks on adjacent white cube,
+		else if (active && allCubes[x, y].GetComponent<Renderer>().material.color == Color.white && (x == activeX + 1 || x == activeX - 1 || y == activeY + 1 || y == activeY - 1)) {
+			//adjacent cube changes color, grows
+			allCubes[x, y].GetComponent<Renderer>().material.color = allCubes[activeX, activeY].GetComponent<Renderer>().material.color;
+			allCubes[x, y].transform.localScale = new Vector3 (growFactor, growFactor, growFactor); 
+			//old cube deactivates/shrinks
+			allCubes[activeX, activeY].GetComponent<Renderer>().material.color = Color.white;
+			allCubes[activeX, activeY].transform.localScale = new Vector3 (shrinkFactor, shrinkFactor, shrinkFactor); 
+			//coordinates & active status reset
+			activeX = x;
+			activeY = y;
+		}
+		//if player clicks on a color cube once a cube is active,
+		else if (active && allCubes[x, y].GetComponent<Renderer>().material.color != Color.white && allCubes[x, y].GetComponent<Renderer>().material.color != Color.black) {
+			//new cube is active/grows
+			allCubes[x, y].transform.localScale = new Vector3 (growFactor, growFactor, growFactor); 
+			//old cube deactivates/shrinks
+			allCubes[activeX, activeY].transform.localScale = new Vector3 (shrinkFactor, shrinkFactor, shrinkFactor); 
+			//new color cube is now active cube
+			activeX = x;
+			activeY = y;
 		}
 	}
 
-	//there is probably a much cleaner way to do this 
-	//maybe by attributing a closed/open (black/white) bool to each non-color cube, instead of checking color each time
 	public void CheckForPlus () {
 		for (int x = 1; x < gridWidth - 1; x++) {
 			for (int y = 1; y < gridHeight - 1; y++) {
@@ -250,11 +262,7 @@ public class GameController : MonoBehaviour {
 								//if bottom cube is same color as center,
 								if (allCubes[x, y - 1].GetComponent<Renderer>().material.color == centerColor) {
 									//color all cubes black
-									allCubes[x,y].GetComponent<Renderer>().material.color = Color.black;
-									allCubes[x + 1, y].GetComponent<Renderer>().material.color = Color.black;
-									allCubes[x - 1, y].GetComponent<Renderer>().material.color = Color.black;
-									allCubes[x, y + 1].GetComponent<Renderer>().material.color = Color.black;
-									allCubes[x, y - 1].GetComponent<Renderer>().material.color = Color.black;
+									MakePlusBlack(x,y);
 									//add to score
 									score += oneColorPoints;
 								}
@@ -271,11 +279,7 @@ public class GameController : MonoBehaviour {
 								//if color of bottom cube is not black, white, or center color
 								if (allCubes[x, y - 1].GetComponent<Renderer>().material.color != Color.white && allCubes[x, y - 1].GetComponent<Renderer>().material.color != Color.black && allCubes[x, y - 1].GetComponent<Renderer>().material.color != centerColor) {
 									//color all cubes black
-									allCubes[x,y].GetComponent<Renderer>().material.color = Color.black;
-									allCubes[x + 1, y].GetComponent<Renderer>().material.color = Color.black;
-									allCubes[x - 1, y].GetComponent<Renderer>().material.color = Color.black;
-									allCubes[x, y + 1].GetComponent<Renderer>().material.color = Color.black;
-									allCubes[x, y - 1].GetComponent<Renderer>().material.color = Color.black;
+									MakePlusBlack(x,y);
 									//add to score
 									score += fiveColorPoints;
 								}
@@ -287,29 +291,34 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
+	void MakePlusBlack (int x, int y) {
+		allCubes[x,y].GetComponent<Renderer>().material.color = Color.black;
+		allCubes[x + 1, y].GetComponent<Renderer>().material.color = Color.black;
+		allCubes[x - 1, y].GetComponent<Renderer>().material.color = Color.black;
+		allCubes[x, y + 1].GetComponent<Renderer>().material.color = Color.black;
+		allCubes[x, y - 1].GetComponent<Renderer>().material.color = Color.black;
+	}
+
 	// Update is called once per frame
 	void Update () {
 		//timer runs from beginning of game
 		timerLength -= Time.deltaTime;
-		timerUI.text = "Time left: " + timerLength;
+		timerUI.text = "Time left: " + timerLength.ToString("F0");
+		if (timerLength <= 10.0f) {
+			timerUI.color = Color.red;
+		}
 		//check keyboard input every frame
 		MoveRandomCube();
+		CheckForPlus();
+		scoreUI.text = "Score: " + score;
 		//if game time exceeds length of game, load Game Over screen
-		if (Time.time > gameLength) {
+		if (Time.timeSinceLevelLoad > gameLength) {
 			Application.LoadLevel(4);
 		}
-		//inside turn:
-		if (Time.time > timeToAct) {
+		//inside turn, generate a random cube
+		if (Time.timeSinceLevelLoad > timeToAct) {
 			GenerateRandomCube();
-			CheckForPlus();
-			scoreUI.text = "Score: " + score;
 			timeToAct += turnLength;
 		}
 	}
 }
-
-/*
-Source for size transform: http://forum.unity3d.com/threads/changing-the-size-of-gameobject.132598/
-Source for button/level info: 
-Thanks to Isaiah for helping with keyboard input
-*/

@@ -14,22 +14,20 @@ public class GameOverScreen : MonoBehaviour {
 		if (GameController.rowWasFull == true) {
 			resultUI.color = Color.red;
 			resultUI.text = "The row was full. You lost!";
-
 		}
 		//if score was less than/equal to 0, player lost
-		else if (GameController.score <= 0) {
+		else if (GameController.score == 0) {
 			resultUI.color = Color.red;
 			resultUI.text = "Your score was too low. You lost!";
-			finalScoreUI.color = Color.blue;
-			finalScoreUI.text = "Final score: " + GameController.score;
 		}
 		//if score was higher than 0, player won
 		else {
 			resultUI.color = Color.green;
 			resultUI.text = "You won!";
-			finalScoreUI.color = Color.blue;
-			finalScoreUI.text = "Final score: " + GameController.score;
 		}
+		//show final score
+		finalScoreUI.color = Color.blue;
+		finalScoreUI.text = "Final score: " + GameController.score;
 	}
 	
 	public void LoadStartScreen () {
@@ -41,3 +39,5 @@ public class GameOverScreen : MonoBehaviour {
 	
 	}
 }
+
+//http://answers.unity3d.com/questions/198878/restart-current-level.html
