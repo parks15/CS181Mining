@@ -52,12 +52,12 @@ public class GameController : MonoBehaviour {
 		//make green score UI
 		score = 0;
 		scoreUI.text = "Score: " + score;
-		scoreUI.color = Color.yellow;
+		scoreUI.color = Color.cyan;
 		//make blue timer UI
 		timerUI.text = "Time left:";
 		timerUI.color = Color.green;
 		//make Next Cube text
-		nextCubeUI.color = Color.cyan;
+		nextCubeUI.color = Color.yellow;
 		//make a cube grid
 		allCubes = new GameObject[gridWidth, gridHeight];
 		for (int x = 0; x < gridWidth; x++) {

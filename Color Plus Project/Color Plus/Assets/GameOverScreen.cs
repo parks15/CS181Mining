@@ -26,7 +26,7 @@ public class GameOverScreen : MonoBehaviour {
 			resultUI.text = "You won!";
 		}
 		//show final score
-		finalScoreUI.color = Color.blue;
+		finalScoreUI.color = Color.yellow;
 		finalScoreUI.text = "Final score: " + GameController.score;
 	}
 	
